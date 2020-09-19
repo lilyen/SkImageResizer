@@ -60,13 +60,13 @@ namespace SkImageResizer
             var tasks = new List<Task>();
             foreach (var filePath in allFiles)
             {
-                var newMethod = NewMethod(destPath, scale, filePath);
-                tasks.Add(newMethod);
+                tasks.Add(CopyFileAsyn(destPath, scale, filePath));
             }
+
             await Task.WhenAll(tasks);
         }
 
-        private static async Task NewMethod(string destPath, double scale, string filePath)
+        private static async Task CopyFileAsyn(string destPath, double scale, string filePath)
         {
             await Task.Run(async () =>
             {
