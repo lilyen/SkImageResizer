@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
@@ -57,18 +58,14 @@ namespace SkImageResizer
 
             var allFiles = FindImages(sourcePath);
 
-            var tasks = new List<Task>();
-            foreach (var filePath in allFiles)
-            {
-                tasks.Add(CopyFileAsyn(destPath, scale, filePath));
-            }
 
+            var tasks = allFiles.Select(x=> CopyFileAsync(destPath, scale, x));
             await Task.WhenAll(tasks);
         }
 
-        private static async Task CopyFileAsyn(string destPath, double scale, string filePath)
+        private static Task CopyFileAsync(string destPath, double scale, string filePath)
         {
-            await Task.Run(async () =>
+            return Task.Run( () =>
             {
                 var bitmap = SKBitmap.Decode(filePath);
                 var imgPhoto = SKImage.FromBitmap(bitmap);
