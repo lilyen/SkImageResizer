@@ -56,7 +56,19 @@ namespace SkImageResizer
             await Task.Yield();
 
             var allFiles = FindImages(sourcePath);
+
+            var tasks = new List<Task>();
             foreach (var filePath in allFiles)
+            {
+                var newMethod = NewMethod(destPath, scale, filePath);
+                tasks.Add(newMethod);
+            }
+            await Task.WhenAll(tasks);
+        }
+
+        private static async Task NewMethod(string destPath, double scale, string filePath)
+        {
+            await Task.Run(async () =>
             {
                 var bitmap = SKBitmap.Decode(filePath);
                 var imgPhoto = SKImage.FromBitmap(bitmap);
@@ -75,7 +87,7 @@ namespace SkImageResizer
                 using var data = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
                 using var s = File.OpenWrite(Path.Combine(destPath, imgName + ".jpg"));
                 data.SaveTo(s);
-            }
+            });
         }
 
         /// <summary>
